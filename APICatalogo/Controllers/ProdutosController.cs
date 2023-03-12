@@ -1,5 +1,7 @@
 ﻿using APICatalogo.Contexts;
+using APICatalogo.Filters;
 using APICatalogo.Models;
+using APICatalogo.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,17 +12,36 @@ namespace APICatalogo.Controllers
     public class ProdutosController : Controller
     {
         private readonly AppDbContext _context;
-        public ProdutosController(AppDbContext context)
+        private readonly ILogger _logger;
+        private readonly IConfiguration _configuration;
+
+        public ProdutosController(AppDbContext context, IConfiguration configuration,
+            ILogger<ProdutosController> logger)
         {
             _context = context;
+            _configuration = configuration;
+            _logger = logger;
+        }
+
+        //Utilizando o IConfiguration para acessar arquivos de configuração
+        [HttpGet("BoasVindas")]
+        public string BoasVindas()
+        {
+            var bemVindo = _configuration["BemVindo"];
+            //Acessando a seção ConnectionStrings e a chave DefaultConnection e obtendo o valor da chave
+            var conexao = _configuration["ConnectionStrings:DefaultConnection"];
+
+            return $"{bemVindo} \n {conexao}";
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Produto>> Get()
+        [ServiceFilter(typeof(ApiLoggingFilter))]
+        public async Task<ActionResult<IEnumerable<Produto>>> GetAsync()
         {
             try
             {
-                var produtos = _context.Produtos.AsNoTracking().Take(5).ToList();
+                _logger.LogInformation("=============== GET PRODUTOS =================");
+                var produtos = await _context.Produtos.AsNoTracking().Take(5).ToListAsync();
 
                 if (produtos is null)
                     return NotFound("Nenhum produto encontrado.");
@@ -34,11 +55,11 @@ namespace APICatalogo.Controllers
         }
 
         [HttpGet("{id:int}", Name = "ObterProduto")]
-        public ActionResult<Produto> Get(int id)
+        public async Task<ActionResult<Produto>> GetByIdAsync(int id)
         {
             try
             {
-                var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
+                var produto = await _context.Produtos.FirstOrDefaultAsync(p => p.ProdutoId == id);
                 if (produto is null)
                     return NotFound();
 
@@ -48,6 +69,12 @@ namespace APICatalogo.Controllers
             {
                 return StatusCode(500);
             }            
+        }
+
+        [HttpGet("saudacao/{nome}")]
+        public ActionResult<string> Saudacao([FromServices]IMeuServico servico, string nome)
+        {
+            return servico.saudacao(nome);
         }
 
         [HttpPost]

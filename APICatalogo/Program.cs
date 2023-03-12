@@ -1,6 +1,9 @@
 using APICatalogo.Contexts;
+using APICatalogo.Extensions;
+using APICatalogo.Filters;
+using APICatalogo.Logging;
+using APICatalogo.Services;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography.Xml;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +19,14 @@ string connectionString = builder.Configuration.GetConnectionString("DefaultConn
 builder.Services.AddDbContext<AppDbContext>(opts => opts.UseMySql(connectionString,
     ServerVersion.AutoDetect(connectionString)));
 
+builder.Services.AddScoped<ApiLoggingFilter>();
+builder.Services.AddTransient<IMeuServico, MeuServico>();
+
+builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
+{
+    logLevel = LogLevel.Information
+}));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -23,6 +34,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.ConfigureExeptionHandler();
 
 app.UseHttpsRedirection();
 
