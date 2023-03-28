@@ -6,7 +6,7 @@ using APICatalogo.Repository;
 using APICatalogo.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace APICatalogo.Controllers
 {
@@ -47,17 +47,28 @@ namespace APICatalogo.Controllers
 
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult<IEnumerable<Produto>> Get([FromQuery]ProdutoParameters param)
+        public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery]ProdutoParameters param)
         {
             try
             {
-                _logger.LogInformation("=============== GET PRODUTOS =================");
-                var produtos = _uof.ProdutoRepository.GetProdutos(param).ToList();
+                //_logger.LogInformation("=============== GET PRODUTOS =================");
+                var produtos = _uof.ProdutoRepository.GetProdutos(param);
 
-                if (produtos is null)
-                    return NotFound("Nenhum produto encontrado.");
+                var metadata = new
+                {
+                    produtos.TotalCount,
+                    produtos.PageSize,
+                    produtos.CurrentPage,
+                    produtos.TotalPages,
+                    produtos.HasNext,
+                    produtos.HasPrevious
+                };
 
-                return produtos;
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+                var produtosDto = _mapper.Map<List<ProdutoDTO>>(produtos);
+
+                return produtosDto;
             }
             catch (Exception)
             {

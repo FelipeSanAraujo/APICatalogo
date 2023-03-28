@@ -53,3 +53,5 @@ C:\Users\Felipe\Documents\Macoratti\APICatalogo\APICatalogo\obj\Debug\net6.0\API
 C:\Users\Felipe\Documents\Macoratti\APICatalogo\APICatalogo\obj\Debug\net6.0\APICatalogo.genruntimeconfig.cache
 C:\Users\Felipe\Documents\Macoratti\APICatalogo\APICatalogo\obj\Debug\net6.0\ref\APICatalogo.dll
 C:\Users\Felipe\Documents\Macoratti\APICatalogo\APICatalogo\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\Felipe\Documents\Macoratti\APICatalogo\APICatalogo\bin\Debug\net6.0\AutoMapper.dll
+C:\Users\Felipe\Documents\Macoratti\APICatalogo\APICatalogo\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

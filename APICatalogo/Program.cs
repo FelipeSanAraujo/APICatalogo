@@ -21,7 +21,7 @@ builder.Services.AddSwaggerGen();
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(opts => opts.UseMySql(connectionString,
     ServerVersion.AutoDetect(connectionString)));
-//builder.Services.AddScoped<ApiLoggingFilter>();
+builder.Services.AddScoped<ApiLoggingFilter>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var mappingConfig = new MapperConfiguration(mc => mc.AddProfile(new MappingProfile()));
